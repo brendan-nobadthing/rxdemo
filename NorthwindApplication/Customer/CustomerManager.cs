@@ -1,21 +1,20 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
+using System.Xml.Schema;
+using Autofac;
 using Redux;
 
 namespace NorthwindApplication.Customer
 {
-    public class CustomerManager : ICustomerManager
+    public class CustomerManager
     {        
         public Store<CustomerState> CustomerStore { get; private set; }
 
-
-        public CustomerManager()
+        public CustomerManager(IContainer container)
         {
-            CustomerStore = new Store<CustomerState>(Reducer, new CustomerState(), EffectMiddleware.Middleware);
+            CustomerStore = new Store<CustomerState>(Reducer, new CustomerState(), new ActionEffectMiddleware(container).Middleware);
         }
-
 
         private CustomerState Reducer(CustomerState state, IAction action)
         {
@@ -34,38 +33,4 @@ namespace NorthwindApplication.Customer
         
         
     }
-
-
-    public static class EffectMiddleware
-    {
-        public static Func<Dispatcher, Dispatcher> Middleware<TState>(IStore<TState> store)
-        {
-            return (Dispatcher next) => (IAction action) =>
-            {
-                var toReturn = next(action); // complete state change first
-
-
-                var genericEffectType = typeof(ActionEffect<,>).MakeGenericType(action.GetType(), typeof(TState));
-                var allEffectTypes = Assembly.GetExecutingAssembly().GetTypes()
-                    .Where(t => genericEffectType.IsAssignableFrom(t));
-
-                // run all effects in background tasks
-                foreach (var effectType in allEffectTypes)
-                {
-                    Task.Run(() =>
-                    {
-                        if (Activator.CreateInstance(effectType) is ActionEffect<TState> effect)
-                        {
-                            var resultAction = effect.Effect(store.GetState(), action);// run the effect
-                            if (resultAction != null) store.Dispatch(resultAction); 
-                        }
-                    });
-                }
-                
-                
-                return toReturn;
-            };
-        }
-    }
-
 }

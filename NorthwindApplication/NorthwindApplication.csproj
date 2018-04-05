@@ -3,6 +3,17 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Autofac" Version="4.6.2" />
+    <PackageReference Include="MediatR" Version="4.1.0" />
     <PackageReference Include="Redux.NET" Version="2.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Customer\Redux" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Northwind\Northwind.csproj">
+      <Project>{A398E353-1FAC-41B2-AC92-13552C35DF69}</Project>
+      <Name>Northwind</Name>
+    </ProjectReference>
   </ItemGroup>
 </Project>
