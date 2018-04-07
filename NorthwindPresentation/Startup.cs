@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Northwind.Ef;
 using NorthwindApplication.Customer;
 using NorthwindApplication.Customer.Actions;
+using NSwag.AspNetCore;
 
 namespace NorthwindPresentation
 {
@@ -71,6 +72,11 @@ namespace NorthwindPresentation
                 routes.MapRoute(
                     name: "default",
                     template: "{controller}/{action=Index}/{id?}");
+            });
+            
+            app.UseSwaggerUi(typeof(Startup).Assembly, settings => 
+            {
+                // configure settings here
             });
 
             app.UseSpa(spa =>

@@ -1,3 +1,24 @@
-<p>
-  customers works!
-</p>
+
+<h2>Customers</h2>
+
+<div *ngIf="customers$ | async as customers">
+<table class="table table-striped">
+  <tr>
+    <th>CustomerID</th>
+    <th>Name</th>
+    <th>Address</th>
+    <th>City</th>
+    <th>Contact Name</th>
+  </tr>
+  <tr *ngFor="let customer of customers$ | async">
+    <td>{{customer.customerId}}</td>
+    <td>{{customer.companyName}}</td>
+    <td>{{customer.address}}</td>
+    <td>{{customer.city}}</td>
+    <td>{{customer.contactName}}</td>
+  </tr>
+</table>
+
+  {{ customers$ | async | json }}
+
+</div>

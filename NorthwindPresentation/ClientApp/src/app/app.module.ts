@@ -8,6 +8,8 @@ import { AppComponent } from './app.component';
 import { NavMenuComponent } from './nav-menu/nav-menu.component';
 import { HomeComponent } from './home/home.component';
 import { CustomersComponent } from './customers/customers.component';
+import { NgxsModule } from '@ngxs/store';
+import { CustomerListState } from './ngxs/CustomerListState';
 
 @NgModule({
   declarations: [
@@ -23,6 +25,9 @@ import { CustomersComponent } from './customers/customers.component';
     RouterModule.forRoot([
       { path: '', component: HomeComponent, pathMatch: 'full' },
       { path: 'customers', component: CustomersComponent },
+    ]),
+    NgxsModule.forRoot([
+      CustomerListState
     ])
   ],
   providers: [],

@@ -16,7 +16,10 @@ namespace NorthwindPresentation.Controllers
         [HttpGet("list")]
         public ActionResult<IEnumerable<Customer>> List()
         {
-            return Ok(StoreContainer.CustomerStore.GetState().CustomerList);
+            return Ok(StoreContainer.CustomerStore.GetState().CustomerList
+                .OrderBy(c => c.CustomerId)
+                .Take(20)
+            );
         }
 
     }

@@ -15,6 +15,7 @@
     <PackageReference Include="Microsoft.AspNetCore.App" Version="2.1.0-preview1-final" />
     <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="2.1.0-preview1-final" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="2.1.0-preview1" />
+    <PackageReference Include="NSwag.AspNetCore" Version="11.16.1" />
   </ItemGroup>
   <ItemGroup>
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.1.0-preview1-final" />
