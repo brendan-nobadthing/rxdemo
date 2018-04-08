@@ -2,8 +2,10 @@ using System;
 using System.Data;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.EntityFrameworkCore;
@@ -30,6 +32,17 @@ namespace NorthwindPresentation
         // This method gets called by the runtime. Use this method to add services to the container.
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
+            services.AddIdentity<IdentityUser, IdentityRole>();
+            services.AddAuthentication(
+                v => {
+                    v.DefaultAuthenticateScheme = GoogleDefaults.AuthenticationScheme;
+                    v.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+                }).AddGoogle(googleOptions =>
+            {
+                googleOptions.ClientId = Configuration["google.ClientId"]; 
+                googleOptions.ClientSecret = Configuration["google.ClientSecret"];
+            });
+            
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             // In production, the Angular files will be served from this directory
@@ -63,6 +76,8 @@ namespace NorthwindPresentation
                 app.UseHsts();
             }
 
+
+            app.UseAuthentication();
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
