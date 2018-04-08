@@ -17,7 +17,7 @@ export class CustomersComponent implements OnInit {
 
   ngOnInit() {
 
-    this.customers$.subscribe(c => console.log('via component subscruption', c));
+    // this.customers$.subscribe(c => console.log('via component subscruption', c));
 
     this.store.dispatch(new LoadCustomerListAction());
   }

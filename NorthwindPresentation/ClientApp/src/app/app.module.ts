@@ -10,13 +10,15 @@ import { HomeComponent } from './home/home.component';
 import { CustomersComponent } from './customers/customers.component';
 import { NgxsModule } from '@ngxs/store';
 import { CustomerListState } from './ngxs/CustomerListState';
+import { EditCustomerComponent } from './customers/edit-customer/edit-customer.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     NavMenuComponent,
     HomeComponent,
-    CustomersComponent
+    CustomersComponent,
+    EditCustomerComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -25,6 +27,7 @@ import { CustomerListState } from './ngxs/CustomerListState';
     RouterModule.forRoot([
       { path: '', component: HomeComponent, pathMatch: 'full' },
       { path: 'customers', component: CustomersComponent },
+      { path: 'customer/edit/:id', component: EditCustomerComponent }
     ]),
     NgxsModule.forRoot([
       CustomerListState

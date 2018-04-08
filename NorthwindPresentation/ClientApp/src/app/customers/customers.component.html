@@ -4,11 +4,12 @@
 <div *ngIf="customers$ | async as customers">
 <table class="table table-striped">
   <tr>
-    <th>CustomerID</th>
+    <th>Id</th>
     <th>Name</th>
     <th>Address</th>
     <th>City</th>
     <th>Contact Name</th>
+    <th></th>
   </tr>
   <tr *ngFor="let customer of customers$ | async">
     <td>{{customer.customerId}}</td>
@@ -16,9 +17,8 @@
     <td>{{customer.address}}</td>
     <td>{{customer.city}}</td>
     <td>{{customer.contactName}}</td>
+    <td class="text-right"><button class="btn btn-info" [routerLink]="['/customer/edit', customer.customerId]">Edit</button></td>
   </tr>
 </table>
-
-  {{ customers$ | async | json }}
 
 </div>

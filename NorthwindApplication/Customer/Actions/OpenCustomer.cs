@@ -1,45 +1,51 @@
 ﻿using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Northwind.Ef;
 using Redux;
 
 namespace NorthwindApplication.Customer.Actions
 {
     public class OpenCustomer : IAction
     {
-
-        public OpenCustomer(Customer customer, string userId)
+        public OpenCustomer(string customerId, string userId)
         {
-            Customer = customer;
-            UserId = userId;
+            CustomerId = customerId;
+            UserId = UserId;
         }
-        
-        public Customer Customer { get; private set; }
+        public string CustomerId { get; private set; }
         public string UserId { get; private set; }
     }
     
-    public class OpenCustomerComplete : IAction
+    
+    
+    public class OpenCustomerEffect : ActionEffect<OpenCustomer, CustomerState>
     {
-    }
-    
-    
-    
-    public class OpenCustomerReducer : ActionReducer<OpenCustomer, CustomerState>
-    {
-        public override CustomerState Reducer(CustomerState state, OpenCustomer action)
+        private readonly NorthwindContext _dbCtx;
+
+        public OpenCustomerEffect(NorthwindContext dbCtx)
         {
-            var item = state.OpenCustomers.FirstOrDefault(oc => oc.Customer.CustomerId == action.Customer.CustomerId)
-                       ?? new OpenedCustomer() { Customer = action.Customer } ;
+            _dbCtx = dbCtx;
+        }
 
-            if (!item.Users.Contains(action.UserId))
-            {
-                item.Users.Add(action.UserId);
-            }
 
-            if (!state.OpenCustomers.Contains(item))
-            {
-                state.OpenCustomers.Add(item);
-            }
-            return state;
+        public override async Task<IAction> Effect(CustomerState prevState, OpenCustomer action)
+        {
+            var customer = await _dbCtx.Customers
+                .Select(c => new Customer()
+                {
+                    Address = c.Address,
+                    City = c.City,
+                    CompanyName = c.CompanyName,
+                    ContactName = c.ContactName,
+                    CustomerId = c.CustomerId
+                })
+                .FirstOrDefaultAsync(c => c.CustomerId == action.CustomerId);
+            return new OpenCustomerSuccess(customer, action.UserId);
         }
     }
+
+
+   
     
 }

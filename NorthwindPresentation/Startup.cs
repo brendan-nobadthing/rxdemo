@@ -14,6 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Northwind.Ef;
 using NorthwindApplication.Customer;
 using NorthwindApplication.Customer.Actions;
+using NorthwindPresentation.Hubs;
 using NSwag.AspNetCore;
 
 namespace NorthwindPresentation
@@ -44,6 +45,8 @@ namespace NorthwindPresentation
             });
             
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            
+            services.AddSignalR();
 
             // In production, the Angular files will be served from this directory
             services.AddSpaStaticFiles(configuration => { configuration.RootPath = "ClientApp/dist"; });
@@ -81,6 +84,11 @@ namespace NorthwindPresentation
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
+            
+            app.UseSignalR(routes =>
+            {
+                routes.MapHub<CustomerHub>("/hubs/customer");
+            });
 
             app.UseMvc(routes =>
             {
