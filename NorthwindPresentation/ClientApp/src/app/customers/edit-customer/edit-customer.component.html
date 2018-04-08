@@ -3,3 +3,22 @@
 <pre *ngIf="customer">
   {{ customer | json  }}
 </pre>
+
+<form [formGroup]="customerForm" novalidate>
+  <div class="form-group">
+    <label for="companyName">Name</label>
+    <input type="text" class="form-control" name="companyName" formControlName="companyName">
+  </div>
+  <div class="form-group">
+    <label for="address">Address</label>
+    <input type="text" class="form-control" name="address" formControlName="address">
+  </div>
+  <div class="form-group">
+    <label for="city">City</label>
+    <input type="text" class="form-control" name="city" formControlName="city">
+  </div>
+  <div class="form-group">
+    <label for="contactName">Contact Name</label>
+    <input type="text" class="form-control" name="contactName" formControlName="contactName">
+  </div>
+</form>

@@ -6,27 +6,35 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using NorthwindApplication.Customer.Actions;
 using System.Reactive.Linq;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Logging;
 using NorthwindApplication.Customer;
 
 namespace NorthwindPresentation.Hubs
 {
+    [Authorize]
     public class CustomerHub : Hub
     {
         private readonly IHubContext<CustomerHub> _hubContext;
+        private readonly ILogger<CustomerHub> _logger;
 
         /// <summary>
         /// keep track of subscriptions so we can unsubscribe
         /// </summary>
         private readonly IDictionary<string, IDisposable> _subscriptions = new Dictionary<string, IDisposable>();
 
-        public CustomerHub(IHubContext<CustomerHub> hubContext)
+        public CustomerHub(IHubContext<CustomerHub> hubContext, ILogger<CustomerHub> logger)
         {
             _hubContext = hubContext;
+            _logger = logger;
+            
+            _logger.LogInformation("New hub instance");
         }
 
 
         public async Task OpenCustomer(string customerId)
         {
+            _logger.LogInformation("hub: OpenCustomer");
             // add current connection to a group by customer id
             await Groups.AddAsync(Context.ConnectionId, customerId);
             
@@ -39,7 +47,7 @@ namespace NorthwindPresentation.Hubs
                     .Subscribe(async oc => {
                         if (oc != null)
                         {
-                            // need to use hubcontext here as this.Clients will be disposed
+                            _logger.LogInformation("hub: customer {customerId} changed. calling push");
                             await _hubContext.Clients.Group(oc.Customer.CustomerId).SendAsync("PushCustomer", oc);
                         }
                     });
@@ -49,10 +57,10 @@ namespace NorthwindPresentation.Hubs
             StoreContainer.CustomerStore.Dispatch(new OpenCustomer(customerId, Context.User.Identity.Name));       
         }
 
-//        public async Task ChangeCustomer(Customer customer)
-//        {
-//            
-//        }
+        public void UpdateCustomer(Customer customer)
+        {
+            StoreContainer.CustomerStore.Dispatch(new UpdateCustomer(customer));
+        }
 //
 //        public async Task SaveCustomer(Customer customer)
 //        {
