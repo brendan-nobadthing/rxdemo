@@ -11,6 +11,7 @@ import { CustomersComponent } from './customers/customers.component';
 import { NgxsModule } from '@ngxs/store';
 import { CustomerListState } from './ngxs/CustomerListState';
 import { EditCustomerComponent } from './customers/edit-customer/edit-customer.component';
+import { CustomersHubService } from './customers/customers-hub.service';
 
 @NgModule({
   declarations: [
@@ -34,7 +35,7 @@ import { EditCustomerComponent } from './customers/edit-customer/edit-customer.c
       CustomerListState
     ])
   ],
-  providers: [],
+  providers: [CustomersHubService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

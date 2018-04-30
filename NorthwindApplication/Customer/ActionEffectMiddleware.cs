@@ -38,7 +38,7 @@ namespace NorthwindApplication.Customer
                             {
                                 var effect = scope.Resolve(effectType) as ActionEffect<TState>;
                                 var resultAction = effect?.Effect(store.GetState(), action).GetAwaiter().GetResult(); // run the effect
-                                if (resultAction != null) store.Dispatch(resultAction); 
+                                if (resultAction != null) store.Dispatch(resultAction);                                
                             }                            
                         }
                     });

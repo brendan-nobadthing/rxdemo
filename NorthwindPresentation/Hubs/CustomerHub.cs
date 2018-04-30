@@ -45,14 +45,11 @@ namespace NorthwindPresentation.Hubs
                     .Select(state => state.OpenCustomers.FirstOrDefault(c => c.Customer.CustomerId == customerId))
                     .DistinctUntilChanged()
                     .Subscribe(async oc => {
-                        if (oc != null)
-                        {
-                            _logger.LogInformation("hub: customer {customerId} changed. calling push");
-                            await _hubContext.Clients.Group(oc.Customer.CustomerId).SendAsync("PushCustomer", oc);
-                        }
+                        if (oc == null) return;
+                        _logger.LogInformation("hub: customer {customerId} changed. calling push");
+                        await _hubContext.Clients.Group(oc.Customer.CustomerId).SendAsync("PushCustomer", oc);
                     });
-            }
-            
+            }         
             // dispatch OpenCustomer action
             StoreContainer.CustomerStore.Dispatch(new OpenCustomer(customerId, Context.User.Identity.Name));       
         }
@@ -61,17 +58,26 @@ namespace NorthwindPresentation.Hubs
         {
             StoreContainer.CustomerStore.Dispatch(new UpdateCustomer(customer));
         }
-//
-//        public async Task SaveCustomer(Customer customer)
-//        {
-//            
-//        }
-//
-//        public async Task CloseCustomer(Customer customer)
-//        {
-//            
-//        }
-        
+
+        public void SaveCustomer(Customer customer)
+        {
+            StoreContainer.CustomerStore.Dispatch(new SaveCustomer(customer));
+        }
+
+
+        public async Task CustomerListSubscribe()
+        {
+            await Groups.AddAsync(Context.ConnectionId, "CustomerList");
+            
+            // subscribe to store
+            StoreContainer.CustomerStore
+                    .Select(state => state.CustomerList)
+                    .DistinctUntilChanged()
+                    .Subscribe(async customerList =>
+                    {
+                        await _hubContext.Clients.Group("CustomerList").SendAsync("PushCustomerList", customerList);
+                    });
+        }
         
         
         
