@@ -17,43 +17,48 @@ namespace NorthwindPresentation.Hubs
     {
         private readonly IHubContext<CustomerHub> _hubContext;
         private readonly ILogger<CustomerHub> _logger;
+        private readonly HubSubscriptionManager _hubSubscriptionManager;
 
-        /// <summary>
-        /// keep track of subscriptions so we can unsubscribe
-        /// </summary>
-        private readonly IDictionary<string, IDisposable> _subscriptions = new Dictionary<string, IDisposable>();
 
-        public CustomerHub(IHubContext<CustomerHub> hubContext, ILogger<CustomerHub> logger)
+        public CustomerHub(IHubContext<CustomerHub> hubContext, 
+            ILogger<CustomerHub> logger, 
+            HubSubscriptionManager hubSubscriptionManager)
         {
             _hubContext = hubContext;
             _logger = logger;
-            
+            _hubSubscriptionManager = hubSubscriptionManager;
+
             _logger.LogInformation("New hub instance");
         }
 
 
         public async Task OpenCustomer(string customerId)
         {
-            _logger.LogInformation("hub: OpenCustomer");
-            // add current connection to a group by customer id
-            await Groups.AddAsync(Context.ConnectionId, customerId);
+            var connectionId = Context.ConnectionId;
+            _logger.LogInformation("hub: OpenCustomer {customerId} for {connectionId}", customerId, Context.ConnectionId);
             
             // subscribe to store
-            if (!_subscriptions.Keys.Contains(customerId))
-            {
-                _subscriptions[customerId] = StoreContainer.CustomerStore
-                    .Select(state => state.OpenCustomers.FirstOrDefault(c => c.Customer.CustomerId == customerId))
-                    .DistinctUntilChanged()
-                    .Subscribe(async oc => {
-                        if (oc == null) return;
-                        _logger.LogInformation("hub: customer {customerId} changed. calling push");
-                        await _hubContext.Clients.Group(oc.Customer.CustomerId).SendAsync("PushCustomer", oc);
-                    });
-            }         
+            var sub = StoreContainer.CustomerStore
+                .Select(state => state.OpenCustomers.FirstOrDefault(c => c.Customer.CustomerId == customerId))
+                .DistinctUntilChanged()
+                .Subscribe(async oc => {
+                    if (oc == null) return;
+                    _logger.LogInformation("hub: customer {customerId} changed. calling push");
+                    await _hubContext.Clients.Client(connectionId).SendAsync("PushCustomer", oc);
+                });
+            _hubSubscriptionManager.Add(connectionId, "Customer", sub);
+                     
             // dispatch OpenCustomer action
             StoreContainer.CustomerStore.Dispatch(new OpenCustomer(customerId, Context.User.Identity.Name));       
         }
+        
 
+        public async Task CloseCustomer()
+        {
+            _hubSubscriptionManager.DisposeAndRemove(Context.ConnectionId, "Customer");
+        }
+
+        
         public void UpdateCustomer(Customer customer)
         {
             StoreContainer.CustomerStore.Dispatch(new UpdateCustomer(customer));
@@ -67,16 +72,29 @@ namespace NorthwindPresentation.Hubs
 
         public async Task CustomerListSubscribe()
         {
-            await Groups.AddAsync(Context.ConnectionId, "CustomerList");
+            var connectionId = Context.ConnectionId;
+            _logger.LogInformation("CustomerListSubscribe {connectionId}", connectionId);
             
             // subscribe to store
-            StoreContainer.CustomerStore
-                    .Select(state => state.CustomerList)
-                    .DistinctUntilChanged()
-                    .Subscribe(async customerList =>
-                    {
-                        await _hubContext.Clients.Group("CustomerList").SendAsync("PushCustomerList", customerList);
-                    });
+            var sub = StoreContainer.CustomerStore
+                .Select(state => state.CustomerList)
+                .DistinctUntilChanged()
+                .Subscribe(async customerList =>
+                {
+                    _logger.LogInformation("Pushing Customer List");
+                    await _hubContext.Clients.Client(connectionId).SendAsync("PushCustomerList", customerList);
+                });
+            _hubSubscriptionManager.Add(connectionId, "CustomerList", sub);
+            
+            // dispatch load
+            // StoreContainer.CustomerStore.Dispatch(new LoadCustomerListAction());
+        }
+        
+        
+        public async Task CustomerListUnSubscribe()
+        {
+            _logger.LogInformation("CustomerListUnSubscribe {connectionId}", Context.ConnectionId);
+            _hubSubscriptionManager.DisposeAndRemove(Context.ConnectionId, "CustomerList");
         }
         
         

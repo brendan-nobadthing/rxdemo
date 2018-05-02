@@ -59,6 +59,10 @@ namespace NorthwindPresentation
             // autofac configuration
             var builder = new ContainerBuilder();
             builder.Populate(services);
+
+            builder.RegisterType<HubSubscriptionManager>()
+                .AsSelf().SingleInstance();
+            
             builder.RegisterModule<CustomerModule>();
             this.AutofacContainer = builder.Build();
           

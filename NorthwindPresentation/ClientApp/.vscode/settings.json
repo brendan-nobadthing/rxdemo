@@ -1,0 +1,4 @@
+{
+  // Always show rule failures as warnings, independent of the tslint configuration.
+  "tslint.alwaysShowRuleFailuresAsWarnings": true,
+}
