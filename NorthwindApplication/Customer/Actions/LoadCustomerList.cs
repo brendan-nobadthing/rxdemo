@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reflection.Metadata.Ecma335;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Northwind.Ef;
 using Redux;
 
@@ -26,15 +27,20 @@ namespace NorthwindApplication.Customer.Actions
     public class LoadCustomerListEffect : ActionEffect<LoadCustomerListAction, CustomerState>
     {
         private readonly NorthwindContext _dbCtx;
+        private readonly ILogger<LoadCustomerListEffect> _logger;
 
-        public LoadCustomerListEffect(NorthwindContext dbCtx)
+        public LoadCustomerListEffect(NorthwindContext dbCtx, ILogger<LoadCustomerListEffect> logger)
         {
             _dbCtx = dbCtx;
+            _logger = logger;
         }
 
         public override async Task<IAction> Effect(CustomerState prevState, LoadCustomerListAction action)
         {
+            _logger.LogInformation("Load Customer List Effect");
+            
             var customers =  await _dbCtx.Customers
+                .OrderBy(c => c.CustomerId)
                 .Select(c => new Customer()
                 {
                     Address = c.Address,
@@ -50,6 +56,7 @@ namespace NorthwindApplication.Customer.Actions
     
     public class LoadCustomerListCompleteReducer : ActionReducer<LoadCustomerListCompleteAction, CustomerState>
     {
+        
         public override CustomerState Reducer(CustomerState prevState, LoadCustomerListCompleteAction action)
         {
             return new CustomerState()

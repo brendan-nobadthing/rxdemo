@@ -17,6 +17,8 @@ namespace NorthwindApplication.Customer.Actions
 
     public class UpdateCustomerReducer : ActionReducer<UpdateCustomer, CustomerState>
     {
+        
+        
         public override CustomerState Reducer(CustomerState state, UpdateCustomer action)
         {
             var prevOc = state.OpenCustomers.FirstOrDefault(oc => oc.Customer.CustomerId == action.Customer.CustomerId) 
@@ -33,7 +35,7 @@ namespace NorthwindApplication.Customer.Actions
                     ContactName = action.Customer.ContactName
                 },
                 Users = prevOc.Users,
-                IsChanged = prevOc.IsChanged
+                IsChanged = true
             };
             state.OpenCustomers.Remove(prevOc);
             state.OpenCustomers.Add(newOc);

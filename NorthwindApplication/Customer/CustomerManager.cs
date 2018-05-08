@@ -18,6 +18,7 @@ namespace NorthwindApplication.Customer
 
         private CustomerState Reducer(CustomerState state, IAction action)
         {
+            Console.WriteLine("reducer handling "+action.GetType());
             var genericActionReducerType = typeof(ActionReducer<,>).MakeGenericType(action.GetType(), typeof(CustomerState));
             var actionReducerType = Assembly.GetExecutingAssembly().GetTypes()
                 .FirstOrDefault(t => genericActionReducerType.IsAssignableFrom(t));

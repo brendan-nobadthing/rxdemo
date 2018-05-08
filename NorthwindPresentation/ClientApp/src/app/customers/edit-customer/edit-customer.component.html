@@ -1,8 +1,6 @@
 <h2>Edit Customer</h2>
 
-<pre *ngIf="customer">
-  {{ customer | json  }}
-</pre>
+
 
 <form [formGroup]="customerForm" novalidate>
   <div class="form-group">
@@ -22,3 +20,8 @@
     <input type="text" class="form-control" name="contactName" formControlName="contactName">
   </div>
 </form>
+
+<div *ngIf="(customerEdit$ | async) && (customerEdit$ | async).isChanged">
+  <button class="btn btn-primary" (click)="saveChanges()">Save Changes</button>
+</div>
+

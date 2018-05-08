@@ -43,13 +43,13 @@ namespace NorthwindPresentation.Hubs
                 .DistinctUntilChanged()
                 .Subscribe(async oc => {
                     if (oc == null) return;
-                    _logger.LogInformation("hub: customer {customerId} changed. calling push");
+                    _logger.LogInformation("hub: customer {customerId} changed. calling push", oc.Customer.CustomerId);
                     await _hubContext.Clients.Client(connectionId).SendAsync("PushCustomer", oc);
                 });
             _hubSubscriptionManager.Add(connectionId, "Customer", sub);
                      
             // dispatch OpenCustomer action
-            StoreContainer.CustomerStore.Dispatch(new OpenCustomer(customerId, Context.User.Identity.Name));       
+            StoreContainer.CustomerStore.Dispatch(new OpenCustomer(customerId, $"{Context.User.Identity.Name} - {connectionId}"));       
         }
         
 
@@ -61,11 +61,13 @@ namespace NorthwindPresentation.Hubs
         
         public void UpdateCustomer(Customer customer)
         {
+            _logger.LogInformation("update customer {customerId}", customer.CustomerId);
             StoreContainer.CustomerStore.Dispatch(new UpdateCustomer(customer));
         }
 
         public void SaveCustomer(Customer customer)
         {
+            _logger.LogInformation("save customer {customerId}", customer.CustomerId);
             StoreContainer.CustomerStore.Dispatch(new SaveCustomer(customer));
         }
 

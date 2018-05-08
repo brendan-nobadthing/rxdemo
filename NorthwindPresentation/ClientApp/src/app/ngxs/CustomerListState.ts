@@ -21,7 +21,6 @@ export class CustomerListStateModel {
 export class CustomerListState {
 
   constructor(
-    private httpClient: HttpClient,
     private customersHub: CustomersHubService
   ) {}
 
@@ -37,23 +36,12 @@ export class CustomerListState {
 
   @Action(CustomerListPushedAction)
   CustomerListPushed(ctx: StateContext<CustomerListStateModel>, action: CustomerListPushedAction) {
+    console.log('CustomerListPushedAction handler');
     const state = ctx.getState();
     ctx.setState({
       ...state,
       customers: action.customerList
     });
-  }
-
-  @Action(LoadCustomerListAction)
-  loadCustomerList({ setState }: StateContext<CustomerListStateModel>) {
-    console.log('LOAD CUSTOMERS');
-    return this.httpClient.get<Customer[]>('https://localhost:5001/api/customer/list')
-      .pipe(tap(result => {
-        console.log('GOT CUSTOMERS', result);
-        setState({
-          customers: result
-        });
-      }));
   }
 
 }

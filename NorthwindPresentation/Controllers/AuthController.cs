@@ -11,7 +11,7 @@ namespace NorthwindPresentation.Controllers
         [HttpGet("login")]
         public IActionResult Login()
         {
-            return Redirect("/customers");
+            return Redirect("/");
         }
         
         

@@ -8,7 +8,6 @@
     <PackageReference Include="Redux.NET" Version="2.0.0" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Customer\Effects" />
     <Folder Include="Customer\Redux" />
   </ItemGroup>
   <ItemGroup>

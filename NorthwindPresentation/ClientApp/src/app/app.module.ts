@@ -12,6 +12,7 @@ import { NgxsModule } from '@ngxs/store';
 import { CustomerListState } from './ngxs/CustomerListState';
 import { EditCustomerComponent } from './customers/edit-customer/edit-customer.component';
 import { CustomersHubService } from './customers/customers-hub.service';
+import { CustomerEditState } from './ngxs/CustomerEditState';
 
 @NgModule({
   declarations: [
@@ -32,7 +33,8 @@ import { CustomersHubService } from './customers/customers-hub.service';
       { path: 'customer/edit/:id', component: EditCustomerComponent }
     ]),
     NgxsModule.forRoot([
-      CustomerListState
+      CustomerListState,
+      CustomerEditState
     ])
   ],
   providers: [CustomersHubService],
